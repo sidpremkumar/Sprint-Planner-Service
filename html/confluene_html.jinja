@@ -1,0 +1,193 @@
+{% for project in updated_projects %}
+<div>
+    <table>
+        <thead>
+        <tr>
+            <th>Project</th>
+            <th>Current Quarter</th>
+            <th>Due Date</th>
+            <th>Days Left</th>
+            <th>Status: {{ project['status'] }}</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="border:0px;padding-bottom:0px;"></td>
+            </tr>
+            <tr>
+                <th style="border:0px;white-space:nowrap;width:5%;vertical-align:middle;" >
+                    <a title="View this issue in JIRA" class="external-link"
+                       rel="nofollow"  href="{{ jira_url }}{{ project["key"] }}"> {{ project["key"] }} </a>
+                </th>
+                <th style="border:0px;vertical-align:middle;">
+                    {% if project['priority'] != Unknown %}
+                        <img src="{{ project['priority_icon'] }}" alt="{{ project['priority'] }}"
+                             style="width:10%;height:auto;"/>
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </th>
+                <th style="border:0px;vertical-align:middle;">
+                    {{ project["epic_summary"] }}
+                </th>
+                <th style="border:0px;vertical-align:middle;">
+                    {% if project['assigned_to_avatar'] %}
+                        <div style="float:left;">
+                            IMAGE_TAG_FOR_{{ project['assigned_to_avatar'] }}
+                        </div>
+                        <div style="float:left;">
+                            {{ project['assigned_to'] }}
+                        </div>
+                    {% else %}
+                        <div style="float:left;">
+                            {{ project['assigned_to'] }}
+                        </div>
+                    {% endif %}
+                </th>
+                <th style="border:0px;vertical-align:middle;">
+                    {{ project["duedate"] }}
+                </th>
+                <th style="border:0px;vertical-align:middle;">
+                    {{ project["days_left"] }}
+                </th>
+                <th style = "border:0px;vertical-align:middle;">
+                    <div style="height: 100%;color: #000000;
+                            width:{{ project['issues_percent'] }}%;
+                            text-align: center; background-color: #808cee;
+                            background-image:
+                            linear-gradient(45deg,
+                            rgba(255,255,255,.15) 25%,
+                            transparent 25%,
+                            transparent 50%,
+                            rgba(255,255,255,.15) 50%,
+                            rgba(255,255,255,.15) 75%,
+                            transparent 75%, transparent);
+                            background-size: 40px 40px; color: #000000;
+                            white-space: nowrap; font-size: 14px;">
+                        <span style="padding-left: 5px; padding-top: 5px">
+                          {{ project['issues_done'] }}/{{ project['issues'] }}
+                          issues done
+                        </span>
+                    </div>
+                </th>
+                </tr>
+                <tr>
+                    <td style="padding-left:50px;border:0px;padding-bottom:20px;padding-top:15px;"
+                        colspan="7">
+                        <table style="border: 0; margin: 0; width: 100%; padding: 1px;width='100%'">
+                            <tr style="width: 100%">
+                                {% if project['status_changes']|length == 0 %}
+                                    <div style='border:0;font-size: 14px; font-weight: bold;
+                                    text-align: center; width: auto;
+                                    {% if project['mvp_status'] == 'Green' %}
+                                       background-color: #14892c;
+                                    {% elif project['mvp_status'] == 'Yellow' %}
+                                        background-color:#ffd351;
+                                    {% elif project['mvp_status'] == 'Red' %}
+                                        background-color:#de350b;
+                                    {% else %}
+                                        background-color:#dfe1e6;
+                                    {% endif %}
+                                    {% if project['mvp_status'] == 'Red' or project['mvp_status'] == 'Green'  %}
+                                        color:white;
+                                    {% else %}
+                                        color:black;
+                                    {%  endif %}'>
+                                        {% if project['mvp_status'] == 'Green' %}
+                                            On Track
+                                        {% elif project['mvp_status'] == 'Yellow' %}
+                                            At Risk
+                                        {% elif project['mvp_status'] == 'Red' %}
+                                            Off Track
+                                        {% elif project['mvp_status'] %}
+                                            MVP Status: {{ project['mvp_status'] }} (no MVP status history available)
+                                        {% else %}
+                                            MVP Status: Unknown (no MVP status history available)
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    {% for status in project['status_changes'] %}
+                                        <td style="width: auto; border:0;overflow:auto;">
+                                            <div style='border-radius: 3px; font-size: 14px;
+                                                {% if loop.index == 0 %}
+                                                    font-weight: bold;
+                                                {% endif %}
+                                                    text-align: center; width: auto;
+                                                {% if loop.index == 0 %}
+                                                    {% if status['mvp_status'] == 'Green' %}
+                                                        background-color:#14892c;
+                                                    {% elif status['mvp_status'] == 'Yellow' %}
+                                                        background-color:#ffd351;
+                                                    {% elif status['mvp_status'] == 'Red' %}
+                                                        background-color:#de350b;
+                                                    {% else %}
+                                                        background-color:#dfe1e6;
+                                                    {% endif %}
+                                                {% else %}
+                                                     {% if status['mvp_status'] == 'Green' %}
+                                                        background-color:#bcf5c8;
+                                                    {% elif status['mvp_status'] == 'Yellow' %}
+                                                        background-color:#ffecb3;
+                                                    {% elif status['mvp_status'] == 'Red' %}
+                                                        background-color:#fcc4b6;
+                                                    {% else %}
+                                                        background-color:#dfe1e6;
+                                                    {% endif %}
+                                                {% endif %}
+                                                {% if loop.index == 0 %}
+                                                    {% if status['mvp_status'] == 'Red'
+                                                            or status['mvp_status'] == 'Green' %}
+                                                        color:white;
+                                                    {% else %}
+                                                        color:black;
+                                                    {% endif %}
+                                                {% else %}
+                                                       color:#3d3d3d;
+                                                {% endif %}'>
+                                                    {% if loop.index != 0 %}
+                                                        {% if status['date'] %}
+                                                            &#x2BC7; {{ status['date'] }}:
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    {% if status['mvp_status'] == 'Green' %}
+                                                        On Track
+                                                    {% elif status['mvp_status'] == 'Yellow' %}
+                                                        At Risk
+                                                    {% elif status['mvp_status'] == 'Red' %}
+                                                        Off Track
+                                                    {% elif status['mvp_status'] %}
+                                                        {{ status['mvp_status'] }}
+                                                    {% endif %}
+                                                    {% if loop.index == 0 %}
+                                                        {% if status['date'] %}
+                                                            since {{ status['date'] }}:
+                                                        {% endif %}
+                                                    {% endif %}
+                                            </div>
+                                        </td>
+                                    {% endfor %}
+                                {% endif %}
+                            </tr>
+                        </table>
+                        <br/>
+                        {% if project['statuscomment'] %}
+                            <p>Last update on {{ project['statuscommentat'] }} {{ project['planned_end'] }}</p>
+                            <p>{{ project['statuscomment'] }}</p>
+                            {% if project['blockers'] %}
+                                <br/><b>Blocked by:</b>
+                                {% for blocker in project['blockers'] %}
+                                    <a href="{{ blocker['url'] }}"> {{ blocker['title'] }}</a>
+                                    {{ "," if not loop.last }}
+                                {% endfor %}
+                            {% endif %}
+                        {% elif project['laststatuscommentat'] %}
+                            <p>No update since {{ project['laststatuscommentat'] }}{{ project['planned_end'] }}</p>
+                        {% else %}
+                            <p>No update since issue created{{ project['planned_end'] }}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+        </tbody>
+    </table>
+</div>
+{% endfor %}
