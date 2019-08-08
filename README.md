@@ -1,4 +1,7 @@
 <h1 align="center"> Sprint Planning Service :pear:</h1>
+<a href='https://sprint-planning-utility.readthedocs.io/en/latest/?badge=latest'>
+    <img src='https://readthedocs.org/projects/sprint-planning-utility/badge/?version=latest' alt='Documentation Status' />
+</a>
 
 ### Config 
 The [config](SPU/config.py) file is used to: 
