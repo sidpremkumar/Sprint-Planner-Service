@@ -1,2 +1,2 @@
 jira
-requests-kerberos
+requests
