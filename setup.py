@@ -1,5 +1,5 @@
 # Local Modules
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('requirements.txt', 'rb') as f:
     install_requires = f.read().decode('utf-8').split('\n')
@@ -13,10 +13,7 @@ setup(
     url='https://github.com/sidpremkumar/Sprint-Planning-Utility',
     license='',
     install_requires=install_requires,
-    packages=[
-        'SPU',
-        '.'
-    ],
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     entry_points={
