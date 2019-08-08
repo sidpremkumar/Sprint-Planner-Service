@@ -6,7 +6,6 @@ This module is used to add some JIRA queries on top of the Python JIRA module.
 import json
 import requests
 
-from requests_kerberos import HTTPKerberosAuth
 from requests.auth import HTTPBasicAuth
 
 
@@ -62,9 +61,7 @@ class JiraClient:
         """ Returns Auth object based on auth type
         :return : Auth Object
         """
-        if self.authtype == 'kerberos':
-            return HTTPKerberosAuth(mutual_authentication=False)
-        elif self.authtype == "basic":
+        if self.authtype == "basic":
             # useful for testing and debugging
             return HTTPBasicAuth(self.username, self.password)
         else:

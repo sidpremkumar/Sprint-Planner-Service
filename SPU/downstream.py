@@ -280,10 +280,10 @@ def start_sync(calender, config, team, name, filters, bad_filters):
     client = get_jira_client(team, config)
     # Get our Rest API JIRA client
     rest_api_client = JiraClient(
-        url=jira_instance['options']['server'],
+        url=config['SPU']['jira'][jira_instance]['options']['server'],
         authtype='basic',
-        username=jira_instance['basic_auth'][0],
-        password=jira_instance['basic_auth'][1]
+        username=config['SPU']['jira'][jira_instance]['basic_auth'][0],
+        password=config['SPU']['jira'][jira_instance]['basic_auth'][1]
     )
     # Get our project ID
     project_id = client.project(team['jira_project']).id
@@ -349,6 +349,7 @@ def start_sync(calender, config, team, name, filters, bad_filters):
 
             # Now create our sprints
             sprints = create_sprints(new_board, sprints, client)
+        import pdb; pdb.set_trace()
 
 
 
