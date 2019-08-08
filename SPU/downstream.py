@@ -349,7 +349,6 @@ def start_sync(calender, config, team, name, filters, bad_filters):
 
             # Now create our sprints
             sprints = create_sprints(new_board, sprints, client)
-        import pdb; pdb.set_trace()
 
 
 
