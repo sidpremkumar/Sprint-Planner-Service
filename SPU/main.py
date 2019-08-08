@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import logging
 
 # Local Modules
-from config import config
+from SPU.config import config
 import SPU.downstream as d
 
 # Global Variables

@@ -1,6 +1,6 @@
 
 config = {
-    'SPS': {
+    'SPU': {
         # Define the first day of Q1 (As a 0-padded number)
         'operational_q1_start': '01-01-19',
 
@@ -16,10 +16,10 @@ config = {
         'jira': {
             'example': {
                 'options': {
-                    'server': 'JIRA_URL',
+                    'server': 'https://projects.devel.engineering.redhat.com',
                     'verify': True,
                 },
-                'basic_auth': ('USERNAME', 'PASSWORD'),
+                'basic_auth': ('spremkum', 'wnmquh6d'),
             },
         },
 

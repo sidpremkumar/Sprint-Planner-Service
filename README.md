@@ -1,7 +1,7 @@
 <h1 align="center"> Sprint Planning Service :pear:</h1>
 
 ### Config 
-The [config](config.py) file is used to: 
+The [config](SPU/config.py) file is used to: 
 1. Set the `operational_q1_start`
 1. Set the `default_jira_instance` and other JIRA credentials 
 1. Teams and relevant information
@@ -14,7 +14,7 @@ You can run the program by installing it first:
 
     > python setup.py install
 
-Set up the [config](config.py) file.
+Set up the [config](SPU/config.py) file.
 
 Then run the program by typing:
 
