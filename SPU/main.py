@@ -4,6 +4,7 @@ This is the main module used to start the utility.
 # Build in Modules
 from datetime import datetime, timedelta
 import logging
+import argparse
 
 # Local Modules
 from SPU.config import config
@@ -213,26 +214,37 @@ def prompt_user(calender, type):
     else:
         bound = len(calender.keys()) + 1
     for quarter in range(1, bound):
-        print(f"* Quarter: {calender[quarter][0]['quarter_string']}")
+        print(f"* Quarter: {calender[quarter][0]['quarter_string']} "
+              f"({calender[quarter][0]['start_date'].strftime('%d-%m-%y')})")
         for sprint in calender[quarter]:
-            print(f"\t {sprint['sprint_string']}")
+            print(f"\t {sprint['sprint_string']} ({sprint['start_date'].strftime('%d-%m-%y')})")
     print(f'Is this valid for {type}?')
     answer = None
     while answer not in ("yes", "no"):
         answer = input("Enter yes or no: ")
-        if answer == "yes":
+        if answer.strip() == "yes":
             return
-        elif answer == "no":
+        elif answer.strip() == "no":
             print('Exiting utility...')
             exit()
         else:
-            print("Please enter yes or no.")
+            print("Please enter yes or no:")
 
 
 def main():
     """
     Function to read config file and start service.
     """
+    # Parse Arguments
+    argparser = argparse.ArgumentParser(usage='Utility to plan sprints and create related boards')
+    argparser.add_argument('-yes', '-y', action='store_true',
+                           default=False,
+                           help='Automatically say yes to all prompts')
+    cargs = argparser.parse_args()
+    no_prompt = False
+    if cargs.yes:
+        no_prompt = True
+
     config = load_config()
     global_start_date = config['SPU']['operational_q1_start']
 
@@ -262,7 +274,8 @@ def main():
 
         if build_global_board:
             # Prompt our user
-            prompt_user(global_calender, GLOBAL_BOARD)
+            if not no_prompt:
+                prompt_user(global_calender, GLOBAL_BOARD)
             # Build our our global board for the JIRA instance
             filter_resp = d.build_global_board(config, global_calender, jira)
             filters[jira['jira_instance']] = filter_resp
@@ -278,7 +291,8 @@ def main():
                                                glob=True)
         if build_global_bad_board:
             # Prompt our user
-            prompt_user(global_calender, GLOBAL_BAD_BOARD)
+            if not no_prompt:
+                prompt_user(global_calender, GLOBAL_BAD_BOARD)
             # Build out global bad board for the JIRA issue
             filter_resp = d.build_global_board(config, global_calender, jira, bad_board=True)
             bad_filters[jira['jira_instance']] = filter_resp
@@ -297,7 +311,8 @@ def main():
             # Check if the boards already exist
             if validate_team(all_boards, calender, team):
                 # Prompt our user
-                prompt_user(calender, team)
+                if not no_prompt:
+                    prompt_user(calender, team)
                 # Now add relevant information downstream
                 d.start_sync(
                     calender=calender,
@@ -316,7 +331,8 @@ def main():
                     break
             if validate_team(all_boards, calender, team):
                 # Prompt our user
-                prompt_user(calender, team)
+                if not no_prompt:
+                    prompt_user(calender, team)
                 # Now add relevant information downstream
                 d.start_sync(
                     calender=calender,
