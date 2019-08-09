@@ -8,6 +8,11 @@ The [config](SPU/config.py) file is used to:
 1. Set the `operational_q1_start`
 1. Set the `default_jira_instance` and other JIRA credentials 
 1. Teams and relevant information
+1. Finally add the following environmental variables: 
+
+    `GLOBAL_BOARD :: Name of the global JIRA board`
+    
+    `GLOBAL_BAD_BOARD : Name of the global bad JIRA board`
 
 Optionally the `run_for_quarter` field can be set to run the utility for a specific quarter
  

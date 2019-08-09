@@ -13,9 +13,16 @@ Want to quickly get started working with SPU? Follow these steps:
 
         > python setup.py install
 
-4. Start the utility with the following command
+4. Set the following environmental variables
+
+    .. code-block:: shell
+
+        > export GLOBAL_BOARD=...
+        > export GLOBAL_BAD_BOARD=...
+
+5. Start the utility with the following command
 
     .. code-block:: shell
 
         > spu
-5. All done! Your boards and sprints should be set up in your JIRA instance!
+6. All done! Your boards and sprints should be set up in your JIRA instance!

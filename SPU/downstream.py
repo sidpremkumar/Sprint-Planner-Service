@@ -159,11 +159,6 @@ def get_global_filters(jira, config, bad_board=False):
 
     # Get the rest API client
     jira_instance = config['SPU']['jira'].get(jira['jira_instance'], False)
-    if not jira_instance:
-        jira_instance = config['SPU'].get('default_jira_instance', False)
-    if not jira_instance:
-        log.error("   No jira_instance for issue and there is no default in the config")
-        raise Exception
 
     rest_api_client = JiraClient(
         url=jira_instance['options']['server'],
@@ -200,12 +195,13 @@ def build_global_board(config, global_calender, jira_instance, bad_board=False):
     if not jira_instance:
         log.error("   No jira_instance for issue and there is no default in the config")
         raise Exception
+
     # Get the rest API client
     rest_api_client = JiraClient(
-        url=jira_instance['options']['server'],
+        url=config['SPU']['jira'][jira_instance['jira_instance']]['options']['server'],
         authtype='basic',
-        username=jira_instance['basic_auth'][0],
-        password=jira_instance['basic_auth'][1]
+        username=config['SPU']['jira'][jira_instance['jira_instance']]['basic_auth'][0],
+        password=config['SPU']['jira'][jira_instance['jira_instance']]['basic_auth'][1]
     )
     # Make 4 filters
     filters = []

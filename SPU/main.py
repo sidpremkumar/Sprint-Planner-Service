@@ -5,14 +5,15 @@ This is the main module used to start the utility.
 from datetime import datetime, timedelta
 import logging
 import argparse
+import os
 
 # Local Modules
 from SPU.config import config
 import SPU.downstream as d
 
 # Global Variables
-GLOBAL_BOARD = 'GLOBAL_BOARD'
-GLOBAL_BAD_BOARD = 'GLOBAL_BAD_BOARD'
+GLOBAL_BOARD = os.environ['GLOBAL_BOARD']
+GLOBAL_BAD_BOARD = os.environ['GLOBAL_BAD_BOARD']
 log = logging.getLogger(__name__)
 
 def load_config():
@@ -128,8 +129,8 @@ def build_calender(global_start, start_date, sprint_length):
             for quarter in range(1, 5):
                 # We have 4 quarters
                 quarter_calender = []
-                for sprint_index in range(1, 4):
-                    # If our sprint length is 3, we need 3 sprints per quarter
+                for sprint_index in range(1, 5):
+                    # If our sprint length is 3, we need 4 sprints per quarter
                     if (current_datetime - sprint_start_datetime).days >= 14:
                         # Every two week change the sprint_start_datetime
                         sprint_start_datetime += timedelta(weeks=2)
@@ -154,7 +155,6 @@ def build_calender(global_start, start_date, sprint_length):
 
                     # Add our entry to the calender
                     quarter_calender.append(new_entry)
-                    index += 1
 
                     # Move 3 weeks in the future
                     current_datetime += timedelta(weeks=3)
@@ -169,11 +169,11 @@ def build_calender(global_start, start_date, sprint_length):
     return calender
 
 
-def validate_team(all_borads, calender, team, glob=False):
+def validate_team(all_boards, calender, team, glob=False):
     """
     Helper function to validate if a team should be synced or not.
 
-    :param Dict all_borads: All boards
+    :param Dict all_boards: All boards
     :param Dict calender: Calender created for the team
     :param String team: Team name
     :param Bool glob: Are we checking for the global board
@@ -190,22 +190,23 @@ def validate_team(all_borads, calender, team, glob=False):
     if not glob:
         # Check if the boards are in JIRA already
         for quarter in quarters:
-            if f'{quarter} - {team} Board' in all_borads.keys():
+            if f'{quarter} - {team} Board' in all_boards.keys():
                 return False
         return True
     else:
         # Check if the boards are in JIRA already
         for quarter in quarters:
-            if f'{team} - {quarter} Board' in all_borads.keys():
+            if f'{team} - {quarter} Board' in all_boards.keys():
                 return False
         return True
 
 
-def prompt_user(calender, type):
+def prompt_user(calender, type, glob=False):
     """
     Prompt the user with what will be created on JIRA.
 
     :param Dict calender: The calender to verify
+    :param Bool glob: Is this a Global Board
     :param String type: What type of calender is this
     """
     print('SPS will create the following Quarters and Sprints')
@@ -216,8 +217,9 @@ def prompt_user(calender, type):
     for quarter in range(1, bound):
         print(f"* Quarter: {calender[quarter][0]['quarter_string']} "
               f"({calender[quarter][0]['start_date'].strftime('%d-%m-%y')})")
-        for sprint in calender[quarter]:
-            print(f"\t {sprint['sprint_string']} ({sprint['start_date'].strftime('%d-%m-%y')})")
+        if not glob:
+            for sprint in calender[quarter]:
+                print(f"\t {sprint['sprint_string']} ({sprint['start_date'].strftime('%d-%m-%y')})")
     print(f'Is this valid for {type}?')
     answer = None
     while answer not in ("yes", "no"):
@@ -229,6 +231,21 @@ def prompt_user(calender, type):
             exit()
         else:
             print("Please enter yes or no:")
+
+
+def validate_calender(calender):
+    """
+    Helper function build out calender based on current time.
+
+    :param Dict calender: Calender dict
+    :return: Updated Calender dict
+    :rtype: Dict
+    """
+    today = datetime.today()
+    # Keep looping until the quarter start is after today
+    for quarter, value in calender.items():
+        if value[0]['start_date'] > today:
+            return {quarter: value}
 
 
 def main():
@@ -275,7 +292,7 @@ def main():
         if build_global_board:
             # Prompt our user
             if not no_prompt:
-                prompt_user(global_calender, GLOBAL_BOARD)
+                prompt_user(global_calender, GLOBAL_BOARD, glob=True)
             # Build our our global board for the JIRA instance
             filter_resp = d.build_global_board(config, global_calender, jira)
             filters[jira['jira_instance']] = filter_resp
@@ -292,7 +309,7 @@ def main():
         if build_global_bad_board:
             # Prompt our user
             if not no_prompt:
-                prompt_user(global_calender, GLOBAL_BAD_BOARD)
+                prompt_user(global_calender, GLOBAL_BAD_BOARD, glob=True)
             # Build out global bad board for the JIRA issue
             filter_resp = d.build_global_board(config, global_calender, jira, bad_board=True)
             bad_filters[jira['jira_instance']] = filter_resp
@@ -306,8 +323,9 @@ def main():
         calender = build_calender(global_start_date, value['sprint_start_date'], value['sprint_length'])
 
         if not config['SPU']['run_for_quarter']:
-            # Only run for the next 4 quarters
-            calender = {1: calender[1], 2: calender[2], 3: calender[3], 4: calender[4]}
+            # Only run for the next quarter
+            calender = validate_calender(calender)
+
             # Check if the boards already exist
             if validate_team(all_boards, calender, team):
                 # Prompt our user
