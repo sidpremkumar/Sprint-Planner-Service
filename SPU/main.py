@@ -114,10 +114,10 @@ def build_calender(global_start, start_date, sprint_length):
                 # Add our quarter calender to the calender
                 calender[index] = quarter_calender
                 index += 1
-            current_year += 1
 
-        # Adding 13th week every quarter
-        current_datetime += timedelta(weeks=1)
+                # Adding 13th week every quarter
+                current_datetime += timedelta(weeks=1)
+            current_year += 1
 
     elif sprint_length == 3:
         # Validate sprint start date
@@ -162,8 +162,8 @@ def build_calender(global_start, start_date, sprint_length):
                 calender[index] = quarter_calender
                 index += 1
 
-            # Adding 13th week every quarter
-            current_datetime += timedelta(weeks=1)
+                # Adding 13th week every quarter
+                current_datetime += timedelta(weeks=1)
 
     # Return our calender
     return calender
@@ -213,8 +213,8 @@ def prompt_user(calender, type, glob=False):
     if len(calender.keys()) > 4:
         bound = 5
     else:
-        bound = len(calender.keys()) + 1
-    for quarter in range(1, bound):
+        bound = calender.keys()
+    for quarter in bound:
         print(f"* Quarter: {calender[quarter][0]['quarter_string']} "
               f"({calender[quarter][0]['start_date'].strftime('%d-%m-%y')})")
         if not glob:
@@ -325,7 +325,6 @@ def main():
         if not config['SPU']['run_for_quarter']:
             # Only run for the next quarter
             calender = validate_calender(calender)
-
             # Check if the boards already exist
             if validate_team(all_boards, calender, team):
                 # Prompt our user
